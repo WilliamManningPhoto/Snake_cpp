@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <cstdlib>
 
 const int CELL = 20; // Constant for cell size in pixel value
 
@@ -24,6 +25,9 @@ void drawGrid(sf::RenderWindow& window) {
 }
 
 int main() {
+    // Utilise random seed at current time
+    srand(time(0));
+
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snake"); // Render window
 
     // Movement
@@ -31,6 +35,11 @@ int main() {
     sf::Clock clock; // Tracking time
     float moveTimer = 0.f;
     float moveInterval = 0.05f; // seconds between each step
+
+    // Food
+    sf::Vector2f food;
+    food.x = (rand() % (800 / CELL)) * CELL;
+    food.y = (rand() % (600 / CELL)) * CELL;
 
     // El squaro snako
     std::vector<sf::Vector2f> snake;
@@ -82,7 +91,12 @@ int main() {
                 square.setFillColor(sf::Color::Green);    // body
             window.draw(square);
         }
-            
+        
+        // Place food
+        square.setFillColor(sf::Color::Red);
+        square.setPosition(food);
+        window.draw(square);
+
         window.display(); // Show the new frame
     }
 }
