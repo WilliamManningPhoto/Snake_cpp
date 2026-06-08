@@ -78,6 +78,15 @@ int main() {
             for (int i = snake.size() - 1; i > 0; i--)
                 snake[i] = snake[i - 1];
             snake[0] += direction * (float)CELL; // move one full cell
+
+                // check if head is on food
+            if (snake[0] == food) {
+                // grow snake by adding a segment at the tail lonk
+                snake.push_back(snake.back());
+                // respawn food
+                food.x = (rand() % (800 / CELL)) * CELL;
+                food.y = (rand() % (600 / CELL)) * CELL;
+            }
         }
 
         window.clear(sf::Color::Black);
