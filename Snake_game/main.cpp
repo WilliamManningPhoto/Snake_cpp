@@ -1,13 +1,36 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
+const int CELL = 20; // Constant for cell size in pixel value
+
+void drawGrid(sf::RenderWindow& window) {
+    sf::Color gridColor(40, 40, 40); // dark grey
+    sf::RectangleShape line; 
+
+    // vertical lines
+    for (int x = 0; x < 800; x += CELL) {
+        line.setSize(sf::Vector2f(1.f, 600.f));
+        line.setFillColor(gridColor);
+        line.setPosition(x, 0);
+        window.draw(line);
+    }
+    // horizontal lines
+    for (int y = 0; y < 600; y += CELL) {
+        line.setSize(sf::Vector2f(800.f, 1.f));
+        line.setFillColor(gridColor);
+        line.setPosition(0, y);
+        window.draw(line);
+    }
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Snake"); // Render window
 
     // Movement
-    float speed = 200.f; // Pixels per second
     sf::Vector2f direction(1.f, 0.f); // Move right Coordinate type stuff
     sf::Clock clock; // Tracking time
+    float moveTimer = 0.f;
+    float moveInterval = 0.05f; // seconds between each step
 
     // El squaro snako
     std::vector<sf::Vector2f> snake;
@@ -19,6 +42,7 @@ int main() {
 
     while (window.isOpen()) { // While the window is open do below:
         float dt = clock.restart().asSeconds();
+        moveTimer += dt;
 
         sf::Event event; // Stores a single event (keypress, close, resize etc)
         while (window.pollEvent(event)) { // Checks the event queue, returns true if there's an event to process
@@ -39,20 +63,23 @@ int main() {
         }
 
         // Move each snake segment to position one in front of each other
-        for (int i = snake.size() - 1; i > 0; i--) {
-            snake[i] = snake[i - 1];
+        // only move when timer exceeds interval
+        if (moveTimer >= moveInterval) {
+            moveTimer = 0.f;
+            for (int i = snake.size() - 1; i > 0; i--)
+                snake[i] = snake[i - 1];
+            snake[0] += direction * (float)CELL; // move one full cell
         }
-        // move the head
-        snake[0] += direction * speed * dt;
 
         window.clear(sf::Color::Black);
+        drawGrid(window);
         // draw every segment after head
         for (int i = 0; i < snake.size(); i++) {
             square.setPosition(snake[i]);
-            if (i <= 2)
-                square.setFillColor(sf::Color::Green);  // head
+            if (i == 0)
+                square.setFillColor(sf::Color::Magenta);  // head
             else
-                square.setFillColor(sf::Color::Red);    // body
+                square.setFillColor(sf::Color::Green);    // body
             window.draw(square);
         }
             
